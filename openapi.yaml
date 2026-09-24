@@ -1,0 +1,499 @@
+openapi: 3.0.3
+info:
+  title: Discussion Board API
+  description: |
+    HTTP API for creating courses, creating discussion topics, viewing
+    discussions and posts, and adding posts to discussions.
+
+    Users do not need to create accounts or authenticate. A display name
+    is provided when creating a discussion or post.
+
+    Discussions belong to a course. Each discussion is created with an
+    initial post, and additional posts can be added afterward.
+  version: 1.0.0
+
+paths:
+  /courses:
+    get:
+      summary: List courses
+      description: |
+        Returns all courses that can be associated with discussions.
+      operationId: listCourses
+      responses:
+        '200':
+          description: All courses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseListResponse'
+              examples:
+                existingCourses:
+                  summary: Existing courses
+                  value:
+                    courses:
+                      - id: 1
+                        department: CSCI
+                        courseNumber: "390"
+                        name: Cloud Computing
+                      - id: 2
+                        department: CSCI
+                        courseNumber: "294"
+                        name: Machine Learning
+                empty:
+                  summary: No courses
+                  value:
+                    courses: []
+
+    post:
+      summary: Create a course
+      description: |
+        Creates a new course from a JSON body.
+      operationId: createCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseRequest'
+            example:
+              department: CSCI
+              courseNumber: "390"
+              name: Cloud Computing
+      responses:
+        '201':
+          description: Course created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCourseResponse'
+              example:
+                id: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /discussions:
+    get:
+      summary: List discussions
+      description: |
+        Returns all discussion summaries, ordered newest first.
+
+        Each summary includes the discussion identifier, title, author of
+        the initial post, creation time, associated course, and number of
+        posts in the discussion.
+      operationId: listDiscussions
+      responses:
+        '200':
+          description: All discussion summaries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscussionListResponse'
+              examples:
+                existingDiscussions:
+                  summary: Existing discussions
+                  value:
+                    discussions:
+                      - id: 2
+                        course:
+                          id: 2
+                          department: CSCI
+                          courseNumber: "294"
+                          name: Machine Learning
+                        title: Question about HW01
+                        author: Connor
+                        createdAt: "2026-09-19T10:30:00Z"
+                        postCount: 1
+                      - id: 1
+                        course:
+                          id: 1
+                          department: CSCI
+                          courseNumber: "390"
+                          name: Cloud Computing
+                        title: Question about EC2
+                        author: Connor
+                        createdAt: "2026-09-17T12:30:00Z"
+                        postCount: 2
+                empty:
+                  summary: No discussions
+                  value:
+                    discussions: []
+
+    post:
+      summary: Create a discussion
+      description: |
+        Creates a new discussion for an existing course. The request
+        includes the discussion title and the initial post. Creating a
+        discussion creates both the discussion and its initial post.
+      operationId: createDiscussion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDiscussionRequest'
+            example:
+              courseId: 1
+              title: Question about EC2
+              authorName: Connor
+              body: I'm confused about how the EC2 instance fits into the architecture.
+      responses:
+        '201':
+          description: Discussion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDiscussionResponse'
+              example:
+                id: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /discussions/{discussionId}:
+    parameters:
+      - $ref: '#/components/parameters/DiscussionId'
+
+    get:
+      summary: Get a discussion
+      description: |
+        Returns a discussion, its associated course, and all posts in
+        chronological order.
+      operationId: getDiscussion
+      responses:
+        '200':
+          description: Discussion found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discussion'
+              example:
+                id: 1
+                course:
+                  id: 1
+                  department: CSCI
+                  courseNumber: "390"
+                  name: Cloud Computing
+                title: Question about EC2
+                posts:
+                  - id: 1
+                    authorName: Connor
+                    body: I'm confused about how the EC2 instance fits into the architecture.
+                    createdAt: "2026-09-17T12:30:00Z"
+                  - id: 2
+                    authorName: Aidan
+                    body: I think the web server and database both run on the same EC2 instance.
+                    createdAt: "2026-09-17T12:50:00Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /discussions/{discussionId}/posts:
+    parameters:
+      - $ref: '#/components/parameters/DiscussionId'
+
+    post:
+      summary: Add a post to a discussion
+      description: |
+        Adds a new post to an existing discussion.
+      operationId: createPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+            example:
+              authorName: Aidan
+              body: I think the web server and database both run on the same EC2 instance.
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+              example:
+                id: 2
+                authorName: Aidan
+                body: I think the web server and database both run on the same EC2 instance.
+                createdAt: "2026-09-17T12:50:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /health:
+    get:
+      summary: Health check
+      description: |
+        Returns whether the service can accept traffic, including a check
+        that the database is reachable.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+        '503':
+          description: Database unreachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: unavailable
+
+components:
+  parameters:
+    DiscussionId:
+      name: discussionId
+      in: path
+      required: true
+      description: Unique discussion identifier
+      schema:
+        type: integer
+        minimum: 1
+      example: 1
+
+  responses:
+    BadRequest:
+      description: The request is invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Required field is missing or invalid
+
+    NotFound:
+      description: The requested resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: NOT_FOUND
+              message: The requested resource was not found
+
+  schemas:
+    Course:
+      type: object
+      required:
+        - id
+        - department
+        - courseNumber
+        - name
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        department:
+          type: string
+        courseNumber:
+          type: string
+        name:
+          type: string
+
+    CourseListResponse:
+      type: object
+      required:
+        - courses
+      properties:
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+
+    CreateCourseRequest:
+      type: object
+      required:
+        - department
+        - courseNumber
+        - name
+      properties:
+        department:
+          type: string
+          minLength: 1
+          maxLength: 10
+        courseNumber:
+          type: string
+          minLength: 1
+          maxLength: 10
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    CreateCourseResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          minimum: 1
+
+    Post:
+      type: object
+      required:
+        - id
+        - authorName
+        - body
+        - createdAt
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        authorName:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreatePostRequest:
+      type: object
+      required:
+        - authorName
+        - body
+      properties:
+        authorName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        body:
+          type: string
+          minLength: 1
+
+    DiscussionSummary:
+      type: object
+      required:
+        - id
+        - course
+        - title
+        - author
+        - createdAt
+        - postCount
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        course:
+          $ref: '#/components/schemas/Course'
+        title:
+          type: string
+        author:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        postCount:
+          type: integer
+          minimum: 1
+
+    DiscussionListResponse:
+      type: object
+      required:
+        - discussions
+      properties:
+        discussions:
+          type: array
+          description: All discussions, newest first
+          items:
+            $ref: '#/components/schemas/DiscussionSummary'
+
+    Discussion:
+      type: object
+      required:
+        - id
+        - course
+        - title
+        - posts
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        course:
+          $ref: '#/components/schemas/Course'
+        title:
+          type: string
+        posts:
+          type: array
+          minItems: 1
+          description: Posts in chronological order
+          items:
+            $ref: '#/components/schemas/Post'
+
+    CreateDiscussionRequest:
+      type: object
+      required:
+        - courseId
+        - title
+        - authorName
+        - body
+      properties:
+        courseId:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        authorName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        body:
+          type: string
+          minLength: 1
+
+    CreateDiscussionResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          minimum: 1
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+            - unavailable
+
+    ErrorBody:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - BAD_REQUEST
+            - NOT_FOUND
+        message:
+          type: string
+          description: Human-readable explanation of the error
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorBody'
