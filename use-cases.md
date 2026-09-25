@@ -14,7 +14,7 @@ The user sees a list of all discussions, the class associated, when it was creat
 
 Discussions are shown newest to oldest. 
 
-Someone using the application has the option to open a discussion on the home page to reply to said discussion. The home page also has the ability to create a new discussion and class.
+Someone using the application has the option to open a discussion on the home page to reply to said discussion. The home page also has the ability to create a new discussion and course.
 
 ### Scenarios
 
@@ -26,6 +26,8 @@ Someone using the application has the option to open a discussion on the home pa
 
 ---
 
+
+
 ## Create a discussion
 
 Someone wants to create a new discussion post.
@@ -34,9 +36,9 @@ They provide:
 
 - a title
 - a question or statement
-- a dropdown selection of a class
+- a dropdown selection of a course
 
-The system creates the new discussion and takes them to the discussion page. The new discussion is created with no replies, and a class associated.
+The system creates the new discussion and takes them to the discussion page. The new discussion is created with no replies, and a course associated.
 
 If the person cancels, they will be returned to the home page displaying all discussions.
 
@@ -44,26 +46,30 @@ If the discussion is blank, or a class is not selected the creation of the discu
 
 ### Scenarios
 
-- **Successful creation** - Valid question or statement, title, and class. The system creates the discussion and opens it's reply page. The new discussion shows zero replies and class association.
+- **Successful creation** - Valid question or statement, title, and course. The system creates the discussion and opens it's reply page. The new discussion shows zero replies and course association.
 - **Cancel** - They leave the creation of a discussion. They return to the home page with discussions listed. No new discussion is created.
-- **Invalid input** - Examples: Missing question, statement, or class association. They stay on the same page and see that the input was invalid. 
+- **Invalid input** - Examples: Missing question, statement, or course association. They stay on the same page and see that the input was invalid.
 
 ---
+
+
 
 ## Open a discussion to reply
 
 Someone picks a discussion from the list to reply to it. 
 
-They see the discussion, number of replies, time created, and class associated. They see each reply in creation order. 
+They see the discussion, creator, number of replies, time created, and course associated. They see each reply in creation order. 
 
 If the poll does not exist, they are told it was not found.
 
 ### Scenarios
 
-- **Discussion Page** - For an existing discussion, they see the statement or question, the replies in creation order, number of replies, and class associated. They have the option to reply to the said discussion.
-- **Unknown discussion** - The discussion id does not exist. they are told the discussion was not found. 
+- **Discussion Page** - For an existing discussion, they see the statement or question, the replies in creation order, number of replies, creator, and class associated. They have the option to reply to said discussion.
+- **Unknown discussion** - The discussion id does not exist. They are told the discussion was not found.
 
 ---
+
+
 
 ## Create a post
 
@@ -80,13 +86,15 @@ If the reply is missing or invalid, the reply fails.
 - **Successful reply** - They provide a valid post. The system records the post and shows the discussion with associated posts. Updating the total vote count.
 - **Unknown discussion** - Voting against a missing discussion fails as not found.
 
---- 
+---
+
+
 
 ## Create a class
 
 Someone has the home page open and chooses to create a new class.
 
-The system records their class department, code, and name. The user then sees the class in the dropdown option in discussion creation. 
+The system records their course department, code, and name. The user then sees the class in the drop down option in discussion creation. 
 
 If an entry is missing or invalid, the creation fails.
 
@@ -95,3 +103,4 @@ If an entry is missing or invalid, the creation fails.
 - **Successful class creation** - They provide valid entries for class department, code, and name. The system records the class, and shows it within a dropdown for discussion posts.
 - **Invalid input** - They user provides invalid input, such as a missing class code. They stay at the creation page and see that the input is invalid.
 - **Cancel** - They leave the creation of a class. They are returned to the class creation page.
+
