@@ -21,8 +21,7 @@ Someone using the application has the option to open a discussion on the home pa
 - **Empty list** - There are no discussions. The list has no rows. Create discussion is still available.
 - **List with data** - Each row shows the discussion, the number of replies, the class associated, time created, and an action to reply.
 - **Newest first** - When more than one discussion is present, the most recent discussion will be displayed first.
-- **Open reply from list** - Choosing reply on a discussion, opens that discussion's page.
-- **Open class from list** - Choosing a class from the list will display all discussions from said class.
+- **Open reply from list** - Choosing view on a discussion, opens that discussion's page.
 
 ---
 
@@ -90,17 +89,17 @@ If the reply is missing or invalid, the reply fails.
 
 
 
-## Create a class
+## Create a course
 
-Someone has the home page open and chooses to create a new class.
+Someone has the home page open and chooses to create a new course.
 
-The system records their course department, code, and name. The user then sees the class in the drop down option in discussion creation. 
+The system records their course department, code, and name. The user then sees the course in the drop down option in discussion creation. 
 
 If an entry is missing or invalid, the creation fails.
 
 ### Scenarios
 
-- **Successful class creation** - They provide valid entries for class department, code, and name. The system records the class, and shows it within a dropdown for discussion posts.
-- **Invalid input** - They user provides invalid input, such as a missing class code. They stay at the creation page and see that the input is invalid.
-- **Cancel** - They leave the creation of a class. They are returned to the class creation page.
+- **Successful course creation** - They provide valid entries for course department, code, and name. The system records the course, and shows it within a dropdown for discussion posts.
+- **Invalid input** - They user provides invalid input, such as a missing course code. They stay at the creation page and see that the input is invalid.
+- **Cancel** - They leave the creation of a course. They are returned to the course creation page.
 
